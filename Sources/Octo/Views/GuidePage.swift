@@ -201,6 +201,9 @@ struct GuidePage: View {
                 tip("hand.raised", "Typing with a palm on the trackpad?",
                     "Gestures ignore taps right after you type, fingers too far apart, and touches near the edges. Adjust it under Gestures → Tuning.")
                 Divider()
+                tip("sparkles", "Learning the gestures?",
+                    "Turn on \"Show which gesture ran\" under Gestures → Tuning: a small hint names each gesture as it runs.")
+                Divider()
                 tip("pause.circle", "Pausing gestures",
                     "Click Gestures in the octopus panel to pause them all. The octopus fades while they're paused.")
                 Divider()

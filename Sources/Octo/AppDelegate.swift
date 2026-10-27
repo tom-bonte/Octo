@@ -56,6 +56,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSPo
         let engine = Engine.shared
         engine.update(config: model.config)
         engine.onLog = { [model] entry in model.addLog(entry) }
+        engine.onPerformed = { [model] gesture, action in
+            if model.config.showGestureHints { GestureHint.show(gesture: gesture, action: action) }
+        }
         engine.onLive = { [model] touches, trackpad, pressed in
             model.liveTouches = touches
             model.liveTrackpad = trackpad
@@ -78,7 +81,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSPo
         model.onChange = { [weak self] in
             self?.updateStatusIcon()
             self?.registerHotKey()
+            if let model = self?.model { FingerOverlay.shared.update(visible: model.config.showFingersOverlay, model: model) }
         }
+        FingerOverlay.shared.update(visible: model.config.showFingersOverlay, model: model)
         KeyboardLock.shared.onChange = { [weak self] in
             self?.model.keyboardLocked = KeyboardLock.shared.isLocked
         }

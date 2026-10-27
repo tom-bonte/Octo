@@ -36,48 +36,7 @@ private struct LiveTrackpadView: View {
                 legend(.secondary, "Ignored", dashed: true)
             }
 
-            Canvas { context, size in
-                let padRect = CGRect(origin: .zero, size: size).insetBy(dx: 1, dy: 1)
-                let pad = Path(roundedRect: padRect, cornerRadius: 16, style: .continuous)
-                context.fill(pad, with: .color(pressed ? Color.accentColor.opacity(0.08) : .primary.opacity(0.04)))
-
-                // Edge zones: touches that start here are ignored.
-                if margin > 0 {
-                    let inner = CGRect(
-                        x: size.width * margin, y: size.height * margin,
-                        width: size.width * (1 - 2 * margin), height: size.height * (1 - 2 * margin)
-                    )
-                    var zone = pad
-                    zone.addPath(Path(roundedRect: inner, cornerRadius: 10, style: .continuous))
-                    context.fill(zone, with: .color(.primary.opacity(0.07)), style: FillStyle(eoFill: true))
-                    context.stroke(Path(roundedRect: inner, cornerRadius: 10, style: .continuous),
-                                   with: .color(.primary.opacity(0.2)), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                }
-                context.stroke(pad, with: .color(pressed ? Color.accentColor.opacity(0.6) : .primary.opacity(0.15)), lineWidth: pressed ? 2 : 1)
-
-                let scale = size.width / width
-                let radius = (pressed ? 6.3 : 7.0) * scale
-                for touch in touches {
-                    let center = CGPoint(x: touch.x * scale, y: size.height - touch.y * scale)
-                    let rect = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
-                    if pressed {
-                        // Pushed-down look: a ring around each finger.
-                        context.stroke(Path(ellipseIn: rect.insetBy(dx: -7, dy: -7)), with: .color(.accentColor.opacity(0.55)), lineWidth: 3)
-                    }
-                    switch touch.role {
-                    case .resting:
-                        context.fill(Path(ellipseIn: rect), with: .color(.accentColor.opacity(0.85)))
-                    case .tapping:
-                        context.fill(Path(ellipseIn: rect), with: .color(.orange.opacity(0.85)))
-                        context.stroke(Path(ellipseIn: rect.insetBy(dx: -6, dy: -6)), with: .color(.orange.opacity(0.5)), lineWidth: 2)
-                    case .other:
-                        context.fill(Path(ellipseIn: rect), with: .color(.secondary.opacity(0.6)))
-                    case .ignored:
-                        context.stroke(Path(ellipseIn: rect), with: .color(.secondary.opacity(0.8)),
-                                       style: StrokeStyle(lineWidth: 2, dash: [3, 3]))
-                    }
-                }
-            }
+            TrackpadCanvas(touches: touches, pressed: pressed, widthMM: width, margin: margin)
             .aspectRatio(width / height, contentMode: .fit)
             .frame(maxWidth: 520)
             .overlay {
@@ -256,6 +215,62 @@ private struct TuningSlider: View {
         case .degrees: "\(Int(value.rounded()))°"
         case .percent: value < 0.005 ? "Off" : "\(Int((value * 100).rounded()))%"
         case .pause: value < 0.025 ? "Off" : "\(Int((value * 1000).rounded())) ms"
+        }
+    }
+}
+
+/// A trackpad with the fingers on it: resting (blue), tapping (orange), other (grey), ignored
+/// (dashed), and a ring when the trackpad is pressed. Used by the Test tab and the on-screen overlay.
+struct TrackpadCanvas: View {
+    let touches: [LiveTouch]
+    let pressed: Bool
+    /// Trackpad width in millimetres (finger positions are in millimetres).
+    let widthMM: Double
+    /// The ignored edge band to shade, as a fraction of the size (0 = none).
+    var margin: Double = 0
+
+    var body: some View {
+        Canvas { context, size in
+            let padRect = CGRect(origin: .zero, size: size).insetBy(dx: 1, dy: 1)
+            let pad = Path(roundedRect: padRect, cornerRadius: 16, style: .continuous)
+            context.fill(pad, with: .color(pressed ? Color.accentColor.opacity(0.08) : .primary.opacity(0.04)))
+
+            // Edge zones: touches that start here are ignored.
+            if margin > 0 {
+                let inner = CGRect(
+                    x: size.width * margin, y: size.height * margin,
+                    width: size.width * (1 - 2 * margin), height: size.height * (1 - 2 * margin)
+                )
+                var zone = pad
+                zone.addPath(Path(roundedRect: inner, cornerRadius: 10, style: .continuous))
+                context.fill(zone, with: .color(.primary.opacity(0.07)), style: FillStyle(eoFill: true))
+                context.stroke(Path(roundedRect: inner, cornerRadius: 10, style: .continuous),
+                               with: .color(.primary.opacity(0.2)), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+            }
+            context.stroke(pad, with: .color(pressed ? Color.accentColor.opacity(0.6) : .primary.opacity(0.15)), lineWidth: pressed ? 2 : 1)
+
+            let scale = size.width / widthMM
+            let radius = (pressed ? 6.3 : 7.0) * scale
+            for touch in touches {
+                let center = CGPoint(x: touch.x * scale, y: size.height - touch.y * scale)
+                let rect = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
+                if pressed {
+                    // Pushed-down look: a ring around each finger.
+                    context.stroke(Path(ellipseIn: rect.insetBy(dx: -7 * scale / 4, dy: -7 * scale / 4)), with: .color(.accentColor.opacity(0.55)), lineWidth: 3)
+                }
+                switch touch.role {
+                case .resting:
+                    context.fill(Path(ellipseIn: rect), with: .color(.accentColor.opacity(0.85)))
+                case .tapping:
+                    context.fill(Path(ellipseIn: rect), with: .color(.orange.opacity(0.85)))
+                    context.stroke(Path(ellipseIn: rect.insetBy(dx: -6 * scale / 4, dy: -6 * scale / 4)), with: .color(.orange.opacity(0.5)), lineWidth: 2)
+                case .other:
+                    context.fill(Path(ellipseIn: rect), with: .color(.secondary.opacity(0.6)))
+                case .ignored:
+                    context.stroke(Path(ellipseIn: rect), with: .color(.secondary.opacity(0.8)),
+                                   style: StrokeStyle(lineWidth: 2, dash: [3, 3]))
+                }
+            }
         }
     }
 }

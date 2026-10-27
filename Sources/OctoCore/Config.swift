@@ -164,6 +164,10 @@ public struct Config: Codable, Equatable, Sendable {
     public var copyTextHotkey = KeyCombo.copyTextDefault
     /// Copy Text: keep line breaks (otherwise lines are joined into one paragraph).
     public var copyTextKeepsLineBreaks = true
+    /// Gestures: briefly show which gesture ran and what it did (for learning, or recording a demo).
+    public var showGestureHints = false
+    /// Gestures: a small live trackpad on screen showing your fingers (for recording a demo).
+    public var showFingersOverlay = false
 
     public init() {}
 
@@ -184,6 +188,8 @@ public struct Config: Codable, Equatable, Sendable {
         awakeKeepsScreenOn = (try? c.decodeIfPresent(Bool.self, forKey: .awakeKeepsScreenOn)) ?? true
         copyTextHotkey = (try? c.decodeIfPresent(KeyCombo.self, forKey: .copyTextHotkey)) ?? .copyTextDefault
         copyTextKeepsLineBreaks = (try? c.decodeIfPresent(Bool.self, forKey: .copyTextKeepsLineBreaks)) ?? true
+        showGestureHints = (try? c.decodeIfPresent(Bool.self, forKey: .showGestureHints)) ?? false
+        showFingersOverlay = (try? c.decodeIfPresent(Bool.self, forKey: .showFingersOverlay)) ?? false
     }
 
     public static var defaultBindings: [GestureBinding] {

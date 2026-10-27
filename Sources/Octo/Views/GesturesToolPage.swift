@@ -66,6 +66,20 @@ struct TuningPage: View {
                 ) {
                     Toggle("Block the extra click", isOn: $model.config.blockTapClicks).labelsHidden().toggleStyle(.switch)
                 }
+                Divider()
+                SettingRow(
+                    title: "Show which gesture ran",
+                    caption: "A small bubble near the bottom of the screen names the gesture and what it did. Handy while you learn the gestures, or when you record a demo."
+                ) {
+                    Toggle("Show which gesture ran", isOn: $model.config.showGestureHints).labelsHidden().toggleStyle(.switch)
+                }
+                Divider()
+                SettingRow(
+                    title: "Show your fingers on screen",
+                    caption: "A small live trackpad in the corner of the screen, so a screen recording shows the gestures you make. Drag it wherever you like."
+                ) {
+                    Toggle("Show your fingers on screen", isOn: $model.config.showFingersOverlay).labelsHidden().toggleStyle(.switch)
+                }
             }
 
             Card {

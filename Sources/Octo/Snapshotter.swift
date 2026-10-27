@@ -45,6 +45,10 @@ enum Snapshotter {
                    size: CGSize(width: 340, height: 410), appearance: appearance,
                    to: folder.appendingPathComponent("menu-panel-\(suffix).png"))
         }
+        render(GestureHintView(gesture: .fingerClick(fingers: 3), action: .openInNewTab), size: CGSize(width: 420, height: 110),
+               appearance: .aqua, to: folder.appendingPathComponent("gesture-hint.png"))
+        render(FingerOverlayView().environment(model), size: CGSize(width: 420, height: 280),
+               appearance: .aqua, to: folder.appendingPathComponent("finger-overlay.png"))
         render(KeyboardLockView(unlocksAt: Date().addingTimeInterval(299)) {}, size: CGSize(width: 1100, height: 720),
                appearance: .darkAqua, to: folder.appendingPathComponent("keyboard-lock.png"))
         for (name, gesturesOn, awake) in [("normal", true, false), ("awake", true, true), ("paused", false, false)] {

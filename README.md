@@ -16,11 +16,15 @@
 </p>
 
 <p align="center">
-  <img src="docs/panel.png" width="380" alt="Octo's menu bar panel with four tiles: Keep Awake, Clean Keyboard, Copy Text and Gestures">
+  <img src="docs/demo.gif" width="800" alt="A step-by-step tour on Wikipedia: a three-finger click opens a link in a new tab, four fingers open it and go there, resting a finger and tapping beside it switches tabs, Copy Text reads a label off a diagram and pastes it into search, and a gesture of your own closes a tab">
 </p>
 
 Click the octopus in your menu bar and every tool is one click away. Octo is free, open source,
 and never connects to the internet.
+
+<p align="center">
+  <img src="docs/panel.png" width="380" alt="Octo's menu bar panel with four tiles: Keep Awake, Clean Keyboard, Copy Text and Gestures, and a Buy me a coffee button">
+</p>
 
 ## What it does
 
@@ -39,6 +43,9 @@ Fast gestures for your browser and Finder, in the spirit of the much-missed Jito
 Change any of them, add your own (any keyboard shortcut, only in the apps you choose), and watch
 your fingers live in the Test view while you get the feel for it. Octo ignores palms resting on the
 edges and taps right after typing, so gestures don't go off by accident.
+
+Learning them? Octo can show a small hint each time a gesture runs, and a live trackpad with your
+fingers on screen, which is also handy for recording a demo (Settings → Gestures → Tuning).
 
 <p align="center">
   <picture>

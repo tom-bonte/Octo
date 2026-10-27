@@ -73,6 +73,8 @@ final class Engine {
     let performer = ActionPerformer()
     /// Both are called on the main thread.
     var onLog: ((LogEntry) -> Void)?
+    /// Called on the main thread after a gesture's action ran (for the on-screen hint).
+    var onPerformed: ((GestureKind, ActionKind) -> Void)?
     var onLive: (([LiveTouch], TrackpadInfo, Bool) -> Void)?
 
     // MARK: Setup (main thread)
@@ -220,6 +222,10 @@ final class Engine {
         }
         performer.perform(effect, at: location)
         log(.action, gesture.title, "\(binding.action.title) in \(appName)")
+        if let onPerformed {
+            let action = binding.action
+            DispatchQueue.main.async { onPerformed(gesture, action) }
+        }
     }
 
     private func scheduleTick(after delay: Double) {
