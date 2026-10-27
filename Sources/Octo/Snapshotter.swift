@@ -42,7 +42,7 @@ enum Snapshotter {
         model.conflicts = []
         for (suffix, appearance) in appearances {
             render(MenuPanel(openSettings: { _ in }, cleanKeyboard: {}, copyText: {}, quit: {}).environment(model),
-                   size: CGSize(width: 340, height: 360), appearance: appearance,
+                   size: CGSize(width: 340, height: 410), appearance: appearance,
                    to: folder.appendingPathComponent("menu-panel-\(suffix).png"))
         }
         render(KeyboardLockView(unlocksAt: Date().addingTimeInterval(299)) {}, size: CGSize(width: 1100, height: 720),

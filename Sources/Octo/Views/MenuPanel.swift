@@ -65,17 +65,22 @@ struct MenuPanel: View {
 
             Divider()
 
-            HStack(spacing: 4) {
-                FooterButton(title: "Test & Tune", symbol: "slider.horizontal.3") {
-                    if !model.editingGesture { model.gestureTab = .test }
-                    openSettings(.gestures)
+            VStack(spacing: 8) {
+                HStack(spacing: 4) {
+                    FooterButton(title: "Test & Tune", symbol: "slider.horizontal.3") {
+                        if !model.editingGesture { model.gestureTab = .test }
+                        openSettings(.gestures)
+                    }
+                    .help("Try gestures and adjust how they feel")
+                    Spacer(minLength: 8)
+                    FooterButton(title: "Settings…", symbol: "gearshape") { openSettings(.gestures) }
+                        .keyboardShortcut(",", modifiers: .command)
+                    FooterButton(title: nil, symbol: "power", action: quit)
+                        .help("Quit Octo")
                 }
-                .help("Try gestures and adjust how they feel")
-                Spacer(minLength: 8)
-                FooterButton(title: "Settings…", symbol: "gearshape") { openSettings(.gestures) }
-                    .keyboardShortcut(",", modifiers: .command)
-                FooterButton(title: nil, symbol: "power", action: quit)
-                    .help("Quit Octo")
+                if AppInfo.supportURL != nil {
+                    CoffeeButton()
+                }
             }
         }
         .padding(16)
@@ -123,6 +128,29 @@ struct MenuPanel: View {
         }
         .padding(10)
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.orange.opacity(0.12)))
+    }
+}
+
+/// "☕ Buy me a coffee": opens the Ko-fi page (the panel closes by itself as the browser opens).
+private struct CoffeeButton: View {
+    @State private var hovering = false
+
+    var body: some View {
+        Button {
+            AppInfo.open(AppInfo.supportURL)
+        } label: {
+            Text("☕  Buy me a coffee")
+                .font(.callout.weight(.medium))
+                .foregroundStyle(SupportCard.tint)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(SupportCard.tint.opacity(hovering ? 0.20 : 0.11)))
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .help("Octo is free. If it saves you time, you can buy me a coffee on Ko-fi.")
+        .frame(maxWidth: .infinity)
     }
 }
 
