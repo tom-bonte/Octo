@@ -1,0 +1,15 @@
+# Built app and release files (made by scripts/build.sh and scripts/release.sh)
+/build/
+/dist/
+
+# SwiftPM and Xcode leftovers
+/.build/
+/.swiftpm/
+xcuserdata/
+*.xcodeproj
+
+# Local design experiments and personal notes
+/Design/
+/PUBLISHING.md
+
+.DS_Store
