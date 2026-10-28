@@ -12,6 +12,13 @@ scripts/build.sh      # builds build/Octo.app (add --universal for Apple Silicon
 scripts/release.sh    # a release: checks, universal build, dist/Octo-<version>.dmg
 ```
 
+`release.sh` lays out the disk image window (Finder needs to be allowed to be controlled the first
+time) with a background picture drawn by `scripts/make-dmg-background.swift`: drag Octo to
+Applications, and what to do when macOS blocks the first launch. `install.sh` at the top of the
+repository is the one-line install from the README: it downloads the latest release with curl,
+checks the signing certificate and copies Octo into Applications. Test it on a local build with
+`OCTO_DMG_URL=file://$PWD/dist/Octo-<version>.dmg zsh install.sh`.
+
 Compiler files go to `~/Library/Caches/Octo/build`, outside the project folder.
 
 ## Signing

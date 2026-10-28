@@ -44,13 +44,87 @@ lipo "$APP/Contents/MacOS/Octo" -verify_arch arm64 x86_64
 
 echo "Making the disk image…"
 mkdir -p dist
-STAGING="$(mktemp -d)"
-trap 'rm -rf "$STAGING"' EXIT
+WORK="$(mktemp -d)"
+MOUNT=""
+cleanup() {
+  [[ -n "$MOUNT" ]] && hdiutil detach -quiet -force "$MOUNT" 2>/dev/null || true
+  rm -rf "$WORK"
+}
+trap cleanup EXIT
+STAGING="$WORK/staging"
+mkdir -p "$STAGING/.background"
 ditto "$APP" "$STAGING/Octo.app"
 ln -s /Applications "$STAGING/Applications"
+swift scripts/make-dmg-background.swift "$STAGING/.background" >/dev/null 2>&1
+
+# A writable image first, so Finder can save the window's layout (icon positions, size,
+# background picture with the install steps) into it. Then it's compressed for download.
+VOLUME="Octo $VERSION"
+[[ -d "/Volumes/$VOLUME" ]] && { echo "Eject the disk named \"$VOLUME\" first" >&2; exit 1; }
+SIZE_MB=$(( $(du -sm "$STAGING" | cut -f1) + 20 ))
+hdiutil create -quiet -volname "$VOLUME" -srcfolder "$STAGING" -fs HFS+ -format UDRW -size "${SIZE_MB}m" "$WORK/rw.dmg"
+hdiutil attach -quiet -readwrite -noverify -noautoopen -mountpoint "/Volumes/$VOLUME" "$WORK/rw.dmg"
+MOUNT="/Volumes/$VOLUME"
+# The window is 660×440 points, the size of the background picture; icon positions are their
+# centres. Finder saves a window's layout lazily and sometimes not at all, so the window is
+# reopened and resized to make it save, and the release waits until the layout file really holds
+# the background picture, trying again if needed.
+lay_out_window() {
+  osascript <<APPLESCRIPT >/dev/null
+tell application "Finder"
+  tell disk "$VOLUME"
+    open
+    tell container window
+      set current view to icon view
+      set toolbar visible to false
+      set statusbar visible to false
+      set the bounds to {200, 120, 860, 560}
+    end tell
+    set viewOptions to the icon view options of container window
+    tell viewOptions
+      set arrangement to not arranged
+      set icon size to 100
+      set text size to 13
+    end tell
+    set background picture of viewOptions to file ".background:background.tiff"
+    set position of item "Octo.app" of container window to {170, 135}
+    set position of item "Applications" of container window to {490, 135}
+    close
+    open
+    delay 1
+    tell container window
+      set statusbar visible to false
+      set the bounds to {200, 120, 850, 550}
+    end tell
+  end tell
+  delay 1
+  tell disk "$VOLUME"
+    tell container window
+      set statusbar visible to false
+      set the bounds to {200, 120, 860, 560}
+    end tell
+    update without registering applications
+  end tell
+end tell
+APPLESCRIPT
+}
+layout_saved() { LC_ALL=C grep -a -q backgroundImageAlias "$MOUNT/.DS_Store" 2>/dev/null }
+for attempt in 1 2 3; do
+  lay_out_window
+  for second in {1..20}; do
+    layout_saved && break 2
+    sleep 1
+  done
+done
+layout_saved || { echo "Finder didn't save the install window's layout. Run the release again." >&2; exit 1; }
+osascript -e "tell application \"Finder\" to close container window of disk \"$VOLUME\"" >/dev/null
+sleep 1
+sync
+hdiutil detach -quiet "$MOUNT"
+MOUNT=""
 DMG="dist/Octo-$VERSION.dmg"
 rm -f "$DMG"
-hdiutil create -quiet -volname "Octo $VERSION" -srcfolder "$STAGING" -fs HFS+ -format UDZO "$DMG"
+hdiutil convert -quiet "$WORK/rw.dmg" -format UDZO -imagekey zlib-level=9 -o "$DMG"
 shasum -a 256 "$DMG" | tee "$DMG.sha256"
 
 echo

@@ -1,12 +1,5 @@
 <p align="center">
-  <img src="docs/icon.png" width="128" alt="Octo's icon: an octopus">
-</p>
-
-<h1 align="center">Octo</h1>
-
-<p align="center">
-  Small tools for your Mac, in one menu bar app.<br>
-  Trackpad gestures · Keep Awake · Clean Keyboard · Copy Text
+  <img src="docs/banner.png" width="100%" alt="Octo: small tools for your Mac, in one menu bar app. Trackpad gestures (Jitouch-style), Keep Awake, Clean Keyboard and Copy Text, shown next to Octo's menu bar panel and settings window">
 </p>
 
 <p align="center">
@@ -23,7 +16,7 @@ Click the octopus in your menu bar and every tool is one click away. Octo is fre
 and never connects to the internet.
 
 <p align="center">
-  <img src="docs/panel.png" width="380" alt="Octo's menu bar panel with four tiles: Keep Awake, Clean Keyboard, Copy Text and Gestures, and a Buy me a coffee button">
+  <img src="docs/menu-bar.png" width="100%" alt="Four tools, one octopus: Octo's menu bar panel with four tiles, Keep Awake, Clean Keyboard, Copy Text and Gestures">
 </p>
 
 ## What it does
@@ -48,10 +41,7 @@ Learning them? Octo can show a small hint each time a gesture runs, and a live t
 fingers on screen, which is also handy for recording a demo (Settings → Gestures → Tuning).
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/settings-dark.png">
-    <img src="docs/settings-light.png" width="800" alt="Octo's settings: the list of gestures, each with a diagram">
-  </picture>
+  <img src="docs/gestures.png" width="100%" alt="Octo's settings: the list of gestures, each with a diagram, under the heading Jitouch-style trackpad gestures">
 </p>
 
 ### Keep Awake
@@ -73,20 +63,33 @@ your Mac, offline.
 
 ## Install
 
+**With one line:** open Terminal (Applications → Utilities), paste this and press Return:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tom-bonte/Octo/main/install.sh | zsh
+```
+
+It downloads the latest release, checks that it's signed with Octo's own certificate, puts Octo in
+Applications and opens it. Installed this way, macOS doesn't ask you to allow Octo in Privacy &
+Security. You can [read the script](install.sh) first.
+
+**Or download it:**
+
 1. Download the latest `Octo-….dmg` from [Releases](../../releases/latest).
-2. Open it and drag **Octo** into **Applications**.
-3. Open Octo from Applications. macOS says it can't verify the developer, because Octo isn't
+2. Open it and drag **Octo** into **Applications** (the window shows you how).
+3. Open Octo from Applications. The first time, macOS says it can't verify Octo, because it isn't
    notarized by Apple (that needs a paid developer account). Click **Done**, open
    **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only do
    this once.
-4. Octo's Guide opens. Click **Allow Access…** and turn on Octo under Accessibility. Copy Text asks
-   for Screen Recording the first time you use it.
+
+**Then:** Octo's Guide opens. Click **Allow Access…** and turn on Octo under Accessibility. Copy
+Text asks for Screen Recording the first time you use it.
 
 **Requirements:** macOS 14 Sonoma or later, on Apple Silicon or Intel. Gestures need a trackpad
 (built-in or Magic Trackpad).
 
-**Updating:** download the new version and replace the old one in Applications. Your settings and
-permissions stay.
+**Updating:** run the same Terminal line again, or download the new version and replace the old
+one in Applications. Your settings and permissions stay.
 
 ## Privacy
 
