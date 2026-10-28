@@ -301,13 +301,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSPo
 
     /// Watches clicks while the panel is open, to close it on any click outside it.
     private var panelClickMonitors: [Any] = []
+    private let panelAnchor = PanelAnchor()
 
     @objc private func togglePanel() {
         guard let button = statusItem?.button else { return }
         if panel.isShown {
             panel.performClose(nil)
         } else {
-            panel.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            let anchor = panelAnchor.view(under: button)
+            panel.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
             FocusReturn.remember()
             NSApp.activate()
             panel.contentViewController?.view.window?.makeKey()
@@ -346,6 +348,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSPo
 
     func popoverDidClose(_ notification: Notification) {
         stopWatchingPanelClicks()
+        panelAnchor.hide()
         // Opening Settings from the panel: stay on the Desktop with it. (The panel finishes closing
         // after Settings has started coming forward, so this must not hand focus back.)
         if settingsWindow == nil { FocusReturn.giveBack() }
